@@ -98,5 +98,28 @@ def get_user_files(user_id):
     conn.close()
     return files
 
+# Функция удаления пользователя
+def delete_user(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    # Удаляем все записи о доступе пользователя к файлам
+    cursor.execute("DELETE FROM file_access WHERE user_id = ?", (user_id,))
+    # Удаляем пользователя
+    cursor.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    
+    conn.commit()
+    conn.close()
+
+# Функция отзыва доступа к файлу
+def revoke_access(user_id, filename):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM file_access WHERE user_id = ? AND filename = ?", (user_id, filename))
+    conn.commit()
+    conn.close()
+
 # Запускаем инициализацию БД при импорте
 init_db()
+
+
