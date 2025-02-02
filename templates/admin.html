@@ -5,6 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админская панель</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const userSelect = document.getElementById("user_id");
+            const checkboxes = document.querySelectorAll('input[name="file_access"]');
+
+            function updatePermissions(userId) {
+                fetch(`/admin/get_permissions/${userId}`)
+                    .then(response => response.json())
+                    .then(files => {
+                        checkboxes.forEach(checkbox => {
+                            checkbox.checked = files.includes(checkbox.value);
+                        });
+                    })
+                    .catch(error => console.error("Ошибка загрузки прав доступа:", error));
+            }
+
+            userSelect.addEventListener("change", function () {
+                updatePermissions(this.value);
+            });
+
+            // Загружаем права доступа при загрузке страницы для первого пользователя
+            if (userSelect.value) {
+                updatePermissions(userSelect.value);
+            }
+        });
+    </script>
 </head>
 <body class="bg-light">
     <div class="container py-5">
@@ -17,7 +43,7 @@
         </div>
 
         <!-- Список пользователей -->
-        <h3 class="mt-4">Пользователи</h3>
+        <h3 class="mt-4">Список пользователей</h3>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -62,9 +88,9 @@
             <button type="submit" class="btn btn-success mt-2">Добавить</button>
         </form>
 
-        <!-- Форма выдачи доступа к файлу -->
-        <h3 class="mt-4">Выдать доступ к файлу</h3>
-        <form method="post" action="{{ url_for('admin.grant_access_route') }}" class="mb-4">
+        <!-- Форма обновления прав доступа к файлам через чекбоксы -->
+        <h3 class="mt-4">Обновление прав доступа к файлам</h3>
+        <form method="post" action="{{ url_for('admin.update_permissions') }}" class="mb-4">
             <div class="mb-3">
                 <label for="user_id" class="form-label">Выберите пользователя</label>
                 <select class="form-select" id="user_id" name="user_id" required>
@@ -73,39 +99,43 @@
                     {% endfor %}
                 </select>
             </div>
+
+            <!-- Список файлов с чекбоксами -->
             <div class="mb-3">
-                <label for="filename" class="form-label">Выберите файл</label>
-                <select class="form-select" id="filename" name="filename" required>
-                    {% for file in files %}
-                    <option value="{{ file }}">{{ file }}</option>
-                    {% endfor %}
-                </select>
+                <h4>Файлы</h4>
+                {% for file in files %}
+                <div class="form-check">
+                    <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        name="file_access" 
+                        value="{{ file }}" 
+                        id="file_{{ file }}">
+                    <label class="form-check-label" for="file_{{ file }}">{{ file }}</label>
+                </div>
+                {% endfor %}
             </div>
-            <button type="submit" class="btn btn-primary">Выдать доступ</button>
+
+            <button type="submit" class="btn btn-primary">Обновить права</button>
         </form>
 
-        <!-- Форма отзыва доступа -->
-        <h3 class="mt-4">Отозвать доступ к файлу</h3>
-        <form method="post" action="{{ url_for('admin.revoke_file_access') }}" class="mb-4">
+        <!-- Форма изменения пароля пользователя -->
+        <h3 class="mt-4">Изменить пароль пользователя</h3>
+        <form method="post" action="{{ url_for('admin.change_password') }}" class="mb-4">
             <div class="mb-3">
-                <label for="user_id_revoke" class="form-label">Выберите пользователя</label>
-                <select class="form-select" id="user_id_revoke" name="user_id" required>
+                <label for="user_id_change" class="form-label">Выберите пользователя</label>
+                <select class="form-select" id="user_id_change" name="user_id" required>
                     {% for user in users %}
                     <option value="{{ user[0] }}">{{ user[1] }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="mb-3">
-                <label for="filename_revoke" class="form-label">Выберите файл</label>
-                <select class="form-select" id="filename_revoke" name="filename" required>
-                    {% for file in files %}
-                    <option value="{{ file }}">{{ file }}</option>
-                    {% endfor %}
-                </select>
+                <label for="new_password" class="form-label">Новый пароль</label>
+                <input type="password" class="form-control" id="new_password" name="new_password" required>
             </div>
-            <button type="submit" class="btn btn-warning">Отозвать доступ</button>
+            <button type="submit" class="btn btn-warning">Изменить пароль</button>
         </form>
-
     </div>
 </body>
 </html>

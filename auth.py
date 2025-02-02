@@ -16,17 +16,12 @@ def init_db():
 
     cursor.execute('''CREATE TABLE IF NOT EXISTS file_access (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        user_id INTEGER,
-                        filename TEXT,
+                        user_id INTEGER NOT NULL,
+                        filename TEXT NOT NULL,
+                        UNIQUE(user_id, filename),  -- Уникальный индекс для предотвращения дублирования
                         FOREIGN KEY(user_id) REFERENCES users(id))''')
 
-    cursor.execute("SELECT id FROM users WHERE username = 'admin'")
-    if not cursor.fetchone():
-        admin_password = hash_password("admin")
-        cursor.execute("INSERT INTO users (username, password, is_admin) VALUES (?, ?, ?)", 
-                       ("admin", admin_password, True))
-        conn.commit()
-
+    conn.commit()
     conn.close()
 
 # Хеширование пароля
@@ -85,8 +80,13 @@ def get_users():
 def grant_access(user_id, filename):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO file_access (user_id, filename) VALUES (?, ?)", (user_id, filename))
-    conn.commit()
+
+    # Проверяем, есть ли уже доступ к файлу у пользователя
+    cursor.execute("SELECT COUNT(*) FROM file_access WHERE user_id = ? AND filename = ?", (user_id, filename))
+    if cursor.fetchone()[0] == 0:  # Если доступ отсутствует, добавляем
+        cursor.execute("INSERT INTO file_access (user_id, filename) VALUES (?, ?)", (user_id, filename))
+        conn.commit()
+
     conn.close()
 
 # Получение списка файлов, доступных пользователю
