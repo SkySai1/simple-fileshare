@@ -1,17 +1,20 @@
-# Используем базовый образ Python
+# Используем официальный образ Python 3.10
 FROM python:3.10
 
-# Устанавливаем рабочую директорию в контейнере
+# Обновляем pip
+RUN pip install --upgrade pip
+
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем файлы проекта
-COPY . /app
+COPY . .
 
 # Устанавливаем зависимости
-RUN pip install --no-cache-dir flask
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Открываем порт 5000
-EXPOSE 5000
+# Открываем порт (по умолчанию Gunicorn использует 8000)
+EXPOSE 8000
 
-# Запускаем приложение
-CMD ["python", "app.py"]
+# Запуск приложения через Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app"]

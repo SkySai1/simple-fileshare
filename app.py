@@ -1,19 +1,23 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask
 import os
+from routes.auth_routes import auth_bp
+from routes.admin_routes import admin_bp
+from routes.file_routes import file_bp
 
 app = Flask(__name__)
-FILES_DIR = "./files"  # Папка с файлами для скачивания
+app.secret_key = "supersecretkey"
+FILES_DIR = "./files"
 
-@app.route('/')
-def index():
-    if not os.path.exists(FILES_DIR):
-        os.makedirs(FILES_DIR)
-    files = os.listdir(FILES_DIR)
-    return render_template('index.html', files=files)
-
-@app.route('/download/<filename>')
-def download_file(filename):
-    return send_from_directory(FILES_DIR, filename, as_attachment=True)
+# Подключаем маршруты
+app.register_blueprint(auth_bp)
+app.register_blueprint(admin_bp)
+app.register_blueprint(file_bp)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    if not os.path.exists(FILES_DIR):
+        os.makedirs(FILES_DIR)
+    
+    port = int(os.getenv("FLASK_PORT", 5000))  # Порт из переменной окружения, иначе 5000
+    debug = os.getenv("FLASK_DEBUG", "False").lower() in ["true", "1"]  # True если "true" или "1"
+    
+    app.run(host='0.0.0.0', port=port, debug=debug)

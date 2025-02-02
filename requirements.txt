@@ -1,0 +1,6 @@
+flask
+bcrypt
+jwt
+flask-oauthlib 
+requests
+gunicorn
