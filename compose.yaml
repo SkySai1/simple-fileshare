@@ -7,3 +7,14 @@ services:
       - "5000:5000"
     volumes:
       - ./files:/app/files
+    depends_on:
+      - redis
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
