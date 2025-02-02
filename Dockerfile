@@ -1,23 +1,20 @@
-# Используем официальный образ Python
+# Используем официальный образ Python 3.10
 FROM python:3.10
 
-# Устанавливаем рабочую директорию в контейнере
+# Обновляем pip
+RUN pip install --upgrade pip
+
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем файлы проекта
-COPY . /app
-
-# Обновляем pip перед установкой зависимостей
-RUN pip install --no-cache-dir --upgrade pip
+COPY . .
 
 # Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Создаем папку для файлов (если её нет)
-RUN mkdir -p /app/files
+# Открываем порт (по умолчанию Gunicorn использует 8000)
+EXPOSE 8000
 
-# Открываем порт 5000
-EXPOSE 5000
-
-# Запускаем приложение
-CMD ["python", "app.py"]
+# Запуск приложения через Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app"]

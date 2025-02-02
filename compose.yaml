@@ -4,7 +4,7 @@ services:
   flask_app:
     build: .
     ports:
-      - "5000:5000"
+      - "8000:8000"
     volumes:
       - ./files:/app/files
     depends_on:
@@ -12,6 +12,7 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - FLASK_PORT=8000
 
   redis:
     image: redis:alpine
