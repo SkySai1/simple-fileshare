@@ -12,8 +12,16 @@
         <tr>
             <td>{{ user.id }}</td>
             <td>{{ user.username }}</td>
-            <td>{% if user.is_admin %}Администратор{% else %}Пользователь{% endif %}</td>
+            <td id="role-{{ user.id }}">
+                {% if user.is_admin %}Администратор{% else %}Пользователь{% endif %}
+            </td>
             <td>
+                {% if session['user']['id'] != user.id %}
+                <div class="form-check form-switch">
+                    <input class="form-check-input toggle-admin" type="checkbox" id="switch-{{ user.id }}" data-user-id="{{ user.id }}" {% if user.is_admin %}checked{% endif %}>
+                    <label class="form-check-label" for="switch-{{ user.id }}"></label>
+                </div>
+                {% endif %}
                 <form method="post" action="{{ url_for('admin.remove_user') }}" class="d-inline">
                     <input type="hidden" name="user_id" value="{{ user.id }}">
                     <button type="submit" class="btn btn-danger btn-sm">Удалить</button>
@@ -23,3 +31,4 @@
         {% endfor %}
     </tbody>
 </table>
+<script src="{{ url_for('static', filename='js/admin_roles.js') }}"></script>
