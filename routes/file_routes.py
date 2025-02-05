@@ -14,7 +14,10 @@ def index():
     
     db: Session = next(get_db())
     user = session["user"]
-    files = get_user_files(db, user["id"]) if not user["is_admin"] else os.listdir(FILES_DIR)
+    files = get_user_files(db, user["id"]) if not user["is_admin"] else [
+        {"filename": f, "size": os.path.getsize(os.path.join(FILES_DIR, f)), "modified": os.path.getmtime(os.path.join(FILES_DIR, f))}
+        for f in os.listdir(FILES_DIR)
+    ]
     public_files = [f for f in os.listdir(FILES_DIR) if is_file_public(db, f)]
     
     return render_template('index.html', files=files, public_files=public_files, user=user)
@@ -26,7 +29,8 @@ def download_file(filename):
     
     db: Session = next(get_db())
     user = session["user"]
-    if user["is_admin"] or filename in get_user_files(db, user["id"]) or is_file_public(db, filename):
+    user_files = get_user_files(db, user["id"])
+    if user["is_admin"] or any(f["filename"] == filename for f in user_files) or is_file_public(db, filename):
         return send_from_directory(FILES_DIR, filename, as_attachment=True)
     
     return "Ошибка: У вас нет доступа к этому файлу", 403
@@ -52,7 +56,7 @@ def upload_file():
     if file.filename == '':
         return jsonify({"error": "Пустое имя файла"}), 400
     
-    file_path = save_file(file)
-    register_file_in_db(session["user"]["id"], file.filename)
+    versioned_filename = save_file(file)
+    register_file_in_db(session["user"]["id"], versioned_filename)
     
-    return jsonify({"success": True, "message": "Файл загружен", "file": file.filename})
+    return jsonify({"success": True, "message": "Файл загружен", "file": versioned_filename})

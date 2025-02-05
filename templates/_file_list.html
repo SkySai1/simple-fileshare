@@ -1,8 +1,16 @@
 <ul class="list-group">
     {% for file in files %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ file }}
-            <a href="{{ url_for('file.download_file', filename=file) }}" class="btn btn-primary btn-sm">Скачать</a>
+            <div>
+                <strong>{{ file.filename }}</strong>
+                <br>
+                <small>Размер: {{ (file.size / 1024)|round(2) }} KB</small>
+                <br>
+                <small>Изменен: {{ file.modified|strftime('%Y-%m-%d %H:%M:%S') }}</small>
+            </div>
+            <a href="{{ url_for('file.download_file', filename=file.filename) }}" class="btn btn-primary btn-sm">
+                Скачать
+            </a>
         </li>
     {% endfor %}
 </ul>

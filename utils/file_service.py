@@ -9,7 +9,21 @@ def grant_access(db: Session, user_id: int, filename: str):
         db.commit()
 
 def get_user_files(db: Session, user_id: int):
-    return [file.filename for file in db.query(FileAccess).filter(FileAccess.user_id == user_id).all()]
+    files_info = []
+    file_records = db.query(FileAccess).filter(FileAccess.user_id == user_id).all()
+    upload_folder = os.getenv("FILE_FOLDER", "./files")
+    
+    for file_record in file_records:
+        file_path = os.path.join(upload_folder, file_record.filename)
+        if os.path.exists(file_path):
+            file_info = {
+                "filename": file_record.filename,
+                "size": os.path.getsize(file_path),
+                "modified": os.path.getmtime(file_path)
+            }
+            files_info.append(file_info)
+    
+    return files_info
 
 def revoke_access(db: Session, user_id: int, filename: str):
     db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.filename == filename).delete()
