@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from utils.models import User
+from utils.models import User, FileAccess
 import bcrypt
 
 def hash_password(password: str) -> str:
@@ -36,6 +36,10 @@ def get_user_by_id(db: Session, user_id: int):
     return None
 
 def delete_user(db: Session, user_id: int):
+    # Удаляем все привилегии пользователя
+    db.query(FileAccess).filter(FileAccess.user_id == user_id).delete()
+    
+    # Удаляем пользователя
     db.query(User).filter(User.id == user_id).delete()
     db.commit()
 
