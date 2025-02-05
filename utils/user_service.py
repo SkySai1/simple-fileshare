@@ -26,7 +26,8 @@ def authenticate_user(db: Session, username: str, password: str):
     return None
 
 def get_users(db: Session):
-    return db.query(User).all()
+    users = db.query(User).all()
+    return [{"id": user.id, "username": user.username, "is_admin": user.is_admin} for user in users]
 
 def delete_user(db: Session, user_id: int):
     db.query(User).filter(User.id == user_id).delete()
