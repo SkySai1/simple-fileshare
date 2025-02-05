@@ -1,4 +1,4 @@
-<form method="post" action="{{ url_for('admin.update_permissions') }}" class="mb-4">
+<form id="permissions-form" class="mb-4">
     <div class="mb-3">
         <label for="user_id" class="form-label">Выберите пользователя</label>
         <select class="form-select" id="user_id" name="user_id" required>
@@ -22,5 +22,7 @@
 
     <button type="submit" class="btn btn-primary">Обновить права</button>
 </form>
+
+<div id="permissions-message" class="alert" style="display: none;"></div>
 
 <script src="{{ url_for('static', filename='js/file_permissions.js') }}"></script>
