@@ -8,12 +8,12 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     is_admin = Column(Boolean, default=False)
-    files = relationship("FileAccess", back_populates="user")
+    files = relationship("FileAccess", back_populates="user", cascade="all, delete-orphan")
 
 class FileAccess(Base):
     __tablename__ = "file_access"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     filename = Column(String, nullable=False)
     is_public = Column(Boolean, default=False)
     user = relationship("User", back_populates="files")
