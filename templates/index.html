@@ -4,5 +4,17 @@
 
 {% block content %}
 <h2 class="mb-4">Доступные файлы</h2>
+
+<!-- Форма загрузки файлов -->
+<form id="upload-form" enctype="multipart/form-data" class="mb-4">
+    <div class="input-group">
+        <input type="file" class="form-control" id="file-input" name="file" required>
+        <button type="submit" class="btn btn-primary">Загрузить</button>
+    </div>
+    <div id="upload-message" class="mt-2"></div>
+</form>
+
 {% include "_file_list.html" %}
+
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

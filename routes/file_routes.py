@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, send_from_directory, redirect, url_for, session, request
+from flask import Blueprint, render_template, send_from_directory, redirect, url_for, session, request, jsonify
 from sqlalchemy.orm import Session
 from utils.database import get_db
-from utils.file_service import get_user_files, grant_access, revoke_access, set_file_public, is_file_public
+from utils.file_service import get_user_files, grant_access, revoke_access, set_file_public, is_file_public, save_file, register_file_in_db
 import os
 
 file_bp = Blueprint('file', __name__)
@@ -39,3 +39,20 @@ def make_public(filename):
     db: Session = next(get_db())
     set_file_public(db, filename, is_public=True)
     return redirect(url_for('file.index'))
+
+@file_bp.route('/upload', methods=['POST'])
+def upload_file():
+    if "user" not in session:
+        return jsonify({"error": "Требуется авторизация"}), 403
+    
+    if 'file' not in request.files:
+        return jsonify({"error": "Файл не найден в запросе"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "Пустое имя файла"}), 400
+    
+    file_path = save_file(file)
+    register_file_in_db(session["user"]["id"], file.filename)
+    
+    return jsonify({"success": True, "message": "Файл загружен", "file": file.filename})

@@ -1,5 +1,7 @@
+import os
 from sqlalchemy.orm import Session
 from utils.models import FileAccess
+from utils.database import get_db
 
 def grant_access(db: Session, user_id: int, filename: str):
     if not db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.filename == filename).first():
@@ -20,3 +22,18 @@ def set_file_public(db: Session, filename: str, is_public: bool = True):
 def is_file_public(db: Session, filename: str) -> bool:
     file = db.query(FileAccess).filter(FileAccess.filename == filename).first()
     return file is not None and file.is_public
+
+def save_file(file):
+    upload_folder = os.getenv("FILE_FOLDER", "./files")
+    if not os.path.exists(upload_folder):
+        os.makedirs(upload_folder)
+    
+    file_path = os.path.join(upload_folder, file.filename)
+    file.save(file_path)
+    return file_path
+
+def register_file_in_db(user_id, filename):
+    db = next(get_db())
+    if not db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.filename == filename).first():
+        db.add(FileAccess(user_id=user_id, filename=filename))
+        db.commit()

@@ -6,7 +6,7 @@ from routes.file_routes import file_bp
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
-FILES_DIR = "./files"
+FILES_DIR = os.getenv("FILE_FOLDER", "./files")
 
 # Подключаем маршруты
 app.register_blueprint(auth_bp)
