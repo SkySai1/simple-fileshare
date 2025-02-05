@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, send_from_directory, redirect, url_for, session, request
 from sqlalchemy.orm import Session
-from utils.db_utils import get_db, get_user_files, grant_access, revoke_access, set_file_public, is_file_public
+from utils.database import get_db
+from utils.file_service import get_user_files, grant_access, revoke_access, set_file_public, is_file_public
 import os
 
 file_bp = Blueprint('file', __name__)

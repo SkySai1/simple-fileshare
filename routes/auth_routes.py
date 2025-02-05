@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, session, jsonify, redirect, url_for
 from sqlalchemy.orm import Session
-from utils.db_utils import get_db, authenticate_user
+from utils.database import get_db
+from utils.user_service import authenticate_user
 
 auth_bp = Blueprint('auth', __name__)
 

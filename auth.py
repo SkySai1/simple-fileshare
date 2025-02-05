@@ -1,6 +1,6 @@
-from fastapi import Depends
 from sqlalchemy.orm import Session
-from utils.db_utils import get_db, authenticate_user, add_user, get_users, update_password, delete_user
+from utils.database import get_db
+from utils.user_service import authenticate_user, add_user, get_users, update_password, delete_user
 
 def login(db: Session, username: str, password: str):
     return authenticate_user(db, username, password)

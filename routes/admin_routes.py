@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, session, jsonify
 from sqlalchemy.orm import Session
-from utils.db_utils import get_db, add_user, get_users, grant_access, update_password, delete_user, revoke_access, get_user_files
+from utils.database import get_db
+from utils.user_service import add_user, get_users, update_password, delete_user
+from utils.file_service import grant_access, revoke_access, get_user_files
 import os
 
 admin_bp = Blueprint('admin', __name__)
