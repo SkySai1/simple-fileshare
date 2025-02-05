@@ -13,6 +13,7 @@ __pycache__/
 *.log
 *.tmp
 *.swp
+users.db
 
 # Исключаем файлы IDE и редакторов
 .vscode/
