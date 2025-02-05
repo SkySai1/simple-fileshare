@@ -1,0 +1,19 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url_for('file.index') }}">Файловый менеджер</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                {% if 'user' in session %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Выйти</a>
+                    </li>
+                    {% if session['user']['is_admin'] %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('admin.admin') }}">Админ-панель</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
