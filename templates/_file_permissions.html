@@ -3,7 +3,9 @@
         <label for="user_id" class="form-label">Выберите пользователя</label>
         <select class="form-select" id="user_id" name="user_id" required>
             {% for user in users %}
+            {% if not user.is_admin %}
             <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endif %}
             {% endfor %}
         </select>
     </div>
@@ -20,3 +22,5 @@
 
     <button type="submit" class="btn btn-primary">Обновить права</button>
 </form>
+
+<script src="{{ url_for('static', filename='js/file_permissions.js') }}"></script>
