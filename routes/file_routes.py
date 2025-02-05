@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from utils.database import get_db
 from utils.file_service import get_user_files, grant_access, revoke_access, set_file_public, is_file_public, save_file, register_file_in_db
 import os
+import datetime
 
 file_bp = Blueprint('file', __name__)
 FILES_DIR = "./files"
@@ -15,10 +16,21 @@ def index():
     db: Session = next(get_db())
     user = session["user"]
     files = get_user_files(db, user["id"]) if not user["is_admin"] else [
-        {"filename": f, "size": os.path.getsize(os.path.join(FILES_DIR, f)), "modified": os.path.getmtime(os.path.join(FILES_DIR, f))}
+        {
+            "filename": f,
+            "size": os.path.getsize(os.path.join(FILES_DIR, f)),
+            "modified": datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(FILES_DIR, f))).strftime('%Y-%m-%d %H:%M:%S')
+        }
         for f in os.listdir(FILES_DIR)
     ]
-    public_files = [f for f in os.listdir(FILES_DIR) if is_file_public(db, f)]
+    public_files = [
+        {
+            "filename": f,
+            "size": os.path.getsize(os.path.join(FILES_DIR, f)),
+            "modified": datetime.datetime.fromtimestamp(os.path.getmtime(os.path.join(FILES_DIR, f))).strftime('%Y-%m-%d %H:%M:%S')
+        }
+        for f in os.listdir(FILES_DIR) if is_file_public(db, f)
+    ]
     
     return render_template('index.html', files=files, public_files=public_files, user=user)
 

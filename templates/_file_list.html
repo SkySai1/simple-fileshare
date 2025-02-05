@@ -6,7 +6,7 @@
                 <br>
                 <small>Размер: {{ (file.size / 1024)|round(2) }} KB</small>
                 <br>
-                <small>Изменен: {{ file.modified|strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                <small>Изменен: {{ file.modified }}</small>
             </div>
             <a href="{{ url_for('file.download_file', filename=file.filename) }}" class="btn btn-primary btn-sm">
                 Скачать
