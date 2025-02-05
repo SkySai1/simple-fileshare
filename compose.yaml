@@ -6,7 +6,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./files:/app/files
+      - /var/fileshare:/app/files
     depends_on:
       - redis
     environment:
