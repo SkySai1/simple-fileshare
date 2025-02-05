@@ -43,3 +43,17 @@ def update_password(db: Session, user_id: int, new_password: str):
     hashed_password = hash_password(new_password)
     db.query(User).filter(User.id == user_id).update({"password": hashed_password})
     db.commit()
+
+def set_admin_status(db: Session, user_id: int, is_admin: bool):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        return False
+    
+    if not is_admin:
+        admin_count = db.query(User).filter(User.is_admin == True).count()
+        if admin_count <= 1:
+            return False  # Запрет на снятие последнего администратора
+    
+    user.is_admin = is_admin
+    db.commit()
+    return True
