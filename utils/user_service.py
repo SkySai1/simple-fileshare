@@ -29,6 +29,12 @@ def get_users(db: Session):
     users = db.query(User).all()
     return [{"id": user.id, "username": user.username, "is_admin": user.is_admin} for user in users]
 
+def get_user_by_id(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        return {"id": user.id, "username": user.username, "is_admin": user.is_admin}
+    return None
+
 def delete_user(db: Session, user_id: int):
     db.query(User).filter(User.id == user_id).delete()
     db.commit()

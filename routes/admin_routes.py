@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, session, jsonify
 from sqlalchemy.orm import Session
 from utils.database import get_db
-from utils.user_service import add_user, get_users, update_password, delete_user
+from utils.user_service import add_user, get_users, get_user_by_id, update_password, delete_user
 from utils.file_service import grant_access, revoke_access, get_user_files
 import os
 
@@ -18,6 +18,20 @@ def admin():
     
     return render_template('admin.html', users=users, files=files)
 
+@admin_bp.route('/admin/users', methods=['GET'])
+def get_users_list():
+    db: Session = next(get_db())
+    users = get_users(db)
+    return jsonify(users)
+
+@admin_bp.route('/admin/user/<int:user_id>', methods=['GET'])
+def get_user_info(user_id):
+    db: Session = next(get_db())
+    user = get_user_by_id(db, user_id)
+    if user:
+        return jsonify(user)
+    return jsonify({"error": "Пользователь не найден"}), 404
+
 @admin_bp.route('/admin/add_user', methods=['POST'])
 def add_user_route():
     db: Session = next(get_db())
@@ -28,9 +42,12 @@ def add_user_route():
     password = request.form.get('password')
     is_admin = request.form.get('is_admin') == "on"
     
+    if get_user_by_id(db, username):
+        return "Ошибка: Пользователь уже существует", 400
+    
     if add_user(db, username, password, is_admin):
         return redirect(url_for('admin.admin'))
-    return "Ошибка: Пользователь уже существует", 400
+    return "Ошибка при добавлении пользователя", 500
 
 @admin_bp.route('/admin/remove_user', methods=['POST'])
 def remove_user():
@@ -75,6 +92,9 @@ def change_password():
     
     user_id = request.form.get('user_id')
     new_password = request.form.get('new_password')
-    update_password(db, user_id, new_password)
     
+    if not get_user_by_id(db, user_id):
+        return "Ошибка: Пользователь не найден", 404
+    
+    update_password(db, user_id, new_password)
     return redirect(url_for('admin.admin'))
