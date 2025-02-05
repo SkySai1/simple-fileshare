@@ -8,6 +8,13 @@ engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
+# Импорт моделей перед созданием таблиц
+from utils.models import Base, User
+import bcrypt
+
+# Создание таблиц
+Base.metadata.create_all(bind=engine)
+
 def get_db():
     db = SessionLocal()
     try:
@@ -15,14 +22,9 @@ def get_db():
     finally:
         db.close()
 
-# Проверяем существование БД и создаем её при необходимости
-if not os.path.exists("users.db"):
-    from utils.models import Base, User
-    import bcrypt
-    
-    Base.metadata.create_all(bind=engine)
-    db = SessionLocal()
-    admin_password = bcrypt.hashpw("admin".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    db.add(User(username="admin", password=admin_password, is_admin=True))
-    db.commit()
-    db.close()
+# Создание администратора, если он отсутствует
+with SessionLocal() as db:
+    if not db.query(User).first():
+        admin_password = bcrypt.hashpw("admin".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        db.add(User(username="admin", password=admin_password, is_admin=True))
+        db.commit()
