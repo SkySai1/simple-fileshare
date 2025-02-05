@@ -6,13 +6,13 @@ import os
 
 admin_permissions_bp = Blueprint('admin_permissions', __name__)
 
-@admin_permissions_bp.route('/admin/get_permissions/<int:user_id>')
+@admin_permissions_bp.route('/get_permissions/<int:user_id>')
 def get_permissions(user_id):
     db: Session = next(get_db())
     user_files = get_user_files(db, user_id) or []
     return jsonify(user_files)
 
-@admin_permissions_bp.route('/admin/update_permissions', methods=['POST'])
+@admin_permissions_bp.route('/update_permissions', methods=['POST'])
 def update_permissions():
     db: Session = next(get_db())
     if "user" not in session or not session["user"]["is_admin"]:

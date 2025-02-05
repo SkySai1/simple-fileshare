@@ -22,7 +22,7 @@ def add_user_route():
         return redirect(url_for('admin_main.admin'))
     return "Ошибка при добавлении пользователя", 500
 
-@admin_users_bp.route('/admin/remove_user', methods=['POST'])
+@admin_users_bp.route('/remove_user', methods=['POST'])
 def remove_user():
     db: Session = next(get_db())
     if "user" not in session or not session["user"]["is_admin"]:
@@ -33,7 +33,7 @@ def remove_user():
     
     return redirect(url_for('admin_main.admin'))
 
-@admin_users_bp.route('/admin/change_password', methods=['POST'])
+@admin_users_bp.route('/change_password', methods=['POST'])
 def change_password():
     db: Session = next(get_db())
     if "user" not in session or not session["user"]["is_admin"]:

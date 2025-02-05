@@ -1,7 +1,7 @@
 from flask import Flask
 import os
 from routes.auth_routes import auth_bp
-from routes.admin_routes import admin_bp
+from routes.admin import admin_bp
 from routes.file_routes import file_bp
 
 app = Flask(__name__)

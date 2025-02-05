@@ -5,7 +5,7 @@ from utils.user_service import set_admin_status
 
 admin_roles_bp = Blueprint('admin_roles', __name__)
 
-@admin_roles_bp.route('/admin/set_admin_status', methods=['POST'])
+@admin_roles_bp.route('/set_admin_status', methods=['POST'])
 def change_admin_status():
     db: Session = next(get_db())
     if "user" not in session or not session["user"]["is_admin"]:
