@@ -2,7 +2,7 @@ from flask import Flask, send_from_directory
 import os
 from routes.auth_routes import auth_bp
 from routes.admin import admin_bp
-from routes.file_routes import file_bp
+from routes.file import file_bp
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"

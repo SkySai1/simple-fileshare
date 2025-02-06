@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const formData = new FormData();
         formData.append("file", fileInput.files[0]);
 
-        fetch("/upload", {
+        fetch("/file/upload", {
             method: "POST",
             body: formData
         })
