@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, redirect, url_for
 import os
 from routes.auth_routes import auth_bp
 from routes.admin import admin_bp
@@ -12,6 +12,12 @@ FILES_DIR = os.getenv("FILE_FOLDER", "./files")
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(file_bp)
+
+# Редирект с корневого пути на список файлов
+@app.route('/')
+def start_point():
+    return redirect(url_for('file.index'))
+
 
 # Маршрут для favicon.ico
 @app.route('/favicon.ico')
