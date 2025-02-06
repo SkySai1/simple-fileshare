@@ -26,6 +26,7 @@ def register_file_in_db(user_id, filename):
 def get_user_files(db: Session, user_id: int):
     file_records = db.query(File).join(FileAccess, File.id == FileAccess.file_id).filter(FileAccess.user_id == user_id).all()
     return [{
+        "file_id": file.id,  # Добавлен file_id
         "filename": file.filename,
         "size": file.size,
         "modified": file.uploaded_at.timestamp(),
