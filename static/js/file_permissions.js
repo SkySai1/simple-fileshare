@@ -14,19 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => console.error("Ошибка загрузки прав доступа:", error));
     }
-    
-    function updatePermissionsWithDetails(userId) {
-        fetch(`/admin/get_permissions/${userId}`)
-            .then(response => response.json())
-            .then(files => {
-                console.log("Детальная информация о файлах:", files);
-            })
-            .catch(error => console.error("Ошибка загрузки подробных данных:", error));
-    }
 
     userSelect.addEventListener("change", function () {
         updatePermissions(this.value);
-        updatePermissionsWithDetails(this.value);
     });
 
     form.addEventListener("submit", function (event) {
@@ -52,6 +42,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (userSelect.value) {
         updatePermissions(userSelect.value);
-        updatePermissionsWithDetails(userSelect.value);
     }
 });

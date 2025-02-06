@@ -5,12 +5,6 @@ from utils.file_service import grant_access, revoke_access, get_user_files
 import os
 
 def register_admin_permissions_routes(admin_bp):
-    @admin_bp.route('/get_permissions/<int:user_id>')
-    def get_permissions(user_id):
-        db: Session = next(get_db())
-        user_files = get_user_files(db, user_id) or []
-        return jsonify(user_files)
-    
     @admin_bp.route('/get_permissions_filenames/<int:user_id>')
     def get_permissions_filenames(user_id):
         db: Session = next(get_db())
