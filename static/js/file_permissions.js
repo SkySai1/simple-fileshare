@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(files => {
                 checkboxes.forEach(checkbox => {
-                    checkbox.checked = files.includes(checkbox.value);
+                    checkbox.checked = files.some(file => file.file_id == checkbox.value);
                 });
             })
             .catch(error => console.error("Ошибка загрузки прав доступа:", error));

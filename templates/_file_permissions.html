@@ -14,8 +14,8 @@
         <h4>Файлы</h4>
         {% for file in files %}
         <div class="form-check">
-            <input class="form-check-input" type="checkbox" name="file_access" value="{{ file }}" id="file_{{ file }}">
-            <label class="form-check-label" for="file_{{ file }}">{{ file }}</label>
+            <input class="form-check-input" type="checkbox" name="file_access" value="{{ file.file_id }}" id="file_{{ file.file_id }}">
+            <label class="form-check-label" for="file_{{ file.file_id }}">{{ file.filename }} ({{ file.owner_username }})</label>
         </div>
         {% endfor %}
     </div>
