@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from utils.database import Base
 import datetime
+import uuid
 
 class User(Base):
     __tablename__ = "users"
@@ -15,7 +16,8 @@ class User(Base):
 class File(Base):
     __tablename__ = "files"
     id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String, nullable=False)
+    original_filename = Column(String, nullable=False)  # Оригинальное имя файла
+    stored_filename = Column(String, unique=True, nullable=False, default=lambda: str(uuid.uuid4()))  # UUID-имя
     owner_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     uploaded_at = Column(DateTime, default=datetime.datetime.utcnow)
     size = Column(Integer, nullable=False)

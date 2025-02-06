@@ -3,19 +3,26 @@ from sqlalchemy.orm import Session
 from utils.models import FileAccess, File, User
 from utils.database import get_db
 import datetime
+import uuid
 
-def add_file_to_db(db: Session, user_id: int, filename: str, size: int):
-    file_entry = File(filename=filename, owner_id=user_id, size=size, uploaded_at=datetime.datetime.utcnow())
+def add_file_to_db(db: Session, user_id: int, original_filename: str, stored_filename: str, size: int):
+    file_entry = File(
+        original_filename=original_filename,
+        stored_filename=stored_filename,
+        owner_id=user_id,
+        size=size,
+        uploaded_at=datetime.datetime.utcnow()
+    )
     db.add(file_entry)
     db.commit()
     db.refresh(file_entry)
     return file_entry.id
 
-def register_file_in_db(user_id, filename):
+def register_file_in_db(user_id, original_filename, stored_filename):
     db = next(get_db())
-    file = db.query(File).filter(File.filename == filename, File.owner_id == user_id).first()
+    file = db.query(File).filter(File.original_filename == original_filename, File.owner_id == user_id).first()
     if not file:
-        file_id = add_file_to_db(db, user_id, filename, os.path.getsize(f"./files/{filename}"))
+        file_id = add_file_to_db(db, user_id, original_filename, stored_filename, os.path.getsize(f"./files/{stored_filename}"))
     else:
         file_id = file.id
     
@@ -27,7 +34,7 @@ def get_user_files(db: Session, user_id: int):
     file_records = db.query(File).join(FileAccess, File.id == FileAccess.file_id).filter(FileAccess.user_id == user_id).all()
     return [{
         "file_id": file.id,
-        "filename": file.filename,
+        "filename": file.original_filename,  # Используем оригинальное имя файла
         "size": file.size,
         "modified": file.uploaded_at.strftime("%Y-%m-%d %H:%M"),
         "is_public": file.is_public
@@ -37,7 +44,7 @@ def get_all_files(db: Session):
     file_records = db.query(File).join(User, File.owner_id == User.id).all()
     return [{
         "file_id": file.id,
-        "filename": file.filename,
+        "filename": file.original_filename,  # Используем оригинальное имя файла
         "size": file.size,
         "modified": file.uploaded_at.strftime("%Y-%m-%d %H:%M"),
         "is_public": file.is_public,
@@ -77,12 +84,13 @@ def save_file(file, user_id):
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
     
-    versioned_filename = get_versioned_filename(upload_folder, file.filename)
-    file_path = os.path.join(upload_folder, versioned_filename)
+    ext = os.path.splitext(file.filename)[1]
+    stored_filename = f"{uuid.uuid4().hex}{ext}"
+    file_path = os.path.join(upload_folder, stored_filename)
     file.save(file_path)
     
     db = next(get_db())
-    file_id = add_file_to_db(db, user_id, versioned_filename, os.path.getsize(file_path))
-    register_file_in_db(user_id, versioned_filename)
+    file_id = add_file_to_db(db, user_id, file.filename, stored_filename, os.path.getsize(file_path))
+    register_file_in_db(user_id, file.filename, stored_filename)
     
-    return versioned_filename
+    return stored_filename
