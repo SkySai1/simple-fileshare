@@ -10,6 +10,12 @@ def register_admin_permissions_routes(admin_bp):
         db: Session = next(get_db())
         user_files = get_user_files(db, user_id) or []
         return jsonify(user_files)
+    
+    @admin_bp.route('/get_permissions_filenames/<int:user_id>')
+    def get_permissions_filenames(user_id):
+        db: Session = next(get_db())
+        user_files = get_user_files(db, user_id) or []
+        return jsonify([f["filename"] for f in user_files])
 
     @admin_bp.route('/update_permissions', methods=['POST'])
     def update_permissions():
