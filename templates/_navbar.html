@@ -9,14 +9,14 @@
                 {% if 'user' in session %}
                     {% if session['user']['is_admin'] %}
                         <li class="nav-item">
-                            <a class="btn btn-warning me-2 mb-2 mb-lg-0" href="{{ url_for('admin.admin') }}">Админ-панель</a>
+                            <a class="nav-link text-warning" href="{{ url_for('admin.admin') }}">Админ-панель</a>
                         </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="btn btn-light me-2 mb-2 mb-lg-0" href="{{ url_for('file.index') }}">Главная</a>
+                        <a class="nav-link text-light" href="{{ url_for('file.index') }}">Главная</a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-danger mb-2 mb-lg-0" href="{{ url_for('auth.logout') }}">Выход</a>
+                        <a class="nav-link text-danger" href="{{ url_for('auth.logout') }}">Выход</a>
                     </li>
                 {% endif %}
             </ul>
