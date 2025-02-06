@@ -16,5 +16,9 @@
 
 {% include "_file_list.html" %}
 
+{% if user.is_admin %}
+    {% include "_file_list_all.html" %}
+{% endif %}
+
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,23 @@
+{% if all_files %}
+<h2 class="mt-4">Все файлы (доступно администратору)</h2>
+<ul class="list-group">
+    {% for file in all_files %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ file.filename }}</strong>
+                <br>
+                <small>Размер: {{ (file.size / 1024)|round(2) }} KB</small>
+                <br>
+                <small>Изменен: {{ file.modified }}</small>
+                <br>
+                <small>Владелец: {{ file.owner_username }}</small>
+            </div>
+            <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">
+                Скачать
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>Файлы отсутствуют.</p>
+{% endif %}

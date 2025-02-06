@@ -1,6 +1,6 @@
 import os
 from sqlalchemy.orm import Session
-from utils.models import FileAccess, File
+from utils.models import FileAccess, File, User
 from utils.database import get_db
 import datetime
 
@@ -26,11 +26,22 @@ def register_file_in_db(user_id, filename):
 def get_user_files(db: Session, user_id: int):
     file_records = db.query(File).join(FileAccess, File.id == FileAccess.file_id).filter(FileAccess.user_id == user_id).all()
     return [{
-        "file_id": file.id,  # Добавлен file_id
+        "file_id": file.id,
         "filename": file.filename,
         "size": file.size,
-        "modified": file.uploaded_at.timestamp(),
+        "modified": file.uploaded_at.strftime("%Y-%m-%d %H:%M"),
         "is_public": file.is_public
+    } for file in file_records]
+
+def get_all_files(db: Session):
+    file_records = db.query(File).join(User, File.owner_id == User.id).all()
+    return [{
+        "file_id": file.id,
+        "filename": file.filename,
+        "size": file.size,
+        "modified": file.uploaded_at.strftime("%Y-%m-%d %H:%M"),
+        "is_public": file.is_public,
+        "owner_username": file.owner.username
     } for file in file_records]
 
 def grant_access(db: Session, user_id: int, file_id: int):
