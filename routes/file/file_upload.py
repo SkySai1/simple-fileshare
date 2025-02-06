@@ -1,5 +1,5 @@
 from flask import request, session, jsonify
-from utils.file_service import save_file, register_file_in_db
+from utils.file_service import save_file
 
 def register_file_upload_routes(file_bp):
     @file_bp.route('/upload', methods=['POST'])
@@ -14,7 +14,6 @@ def register_file_upload_routes(file_bp):
         if file.filename == '':
             return jsonify({"error": "Пустое имя файла"}), 400
         
-        versioned_filename = save_file(file)
-        register_file_in_db(session["user"]["id"], versioned_filename)
+        versioned_filename = save_file(file, session["user"]["id"])
         
         return jsonify({"success": True, "message": "Файл загружен", "file": versioned_filename})

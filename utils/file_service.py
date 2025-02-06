@@ -1,40 +1,52 @@
 import os
 from sqlalchemy.orm import Session
-from utils.models import FileAccess
+from utils.models import FileAccess, File
 from utils.database import get_db
+import datetime
 
-def grant_access(db: Session, user_id: int, filename: str):
-    if not db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.filename == filename).first():
-        db.add(FileAccess(user_id=user_id, filename=filename))
+def add_file_to_db(db: Session, user_id: int, filename: str, size: int):
+    file_entry = File(filename=filename, owner_id=user_id, size=size, uploaded_at=datetime.datetime.utcnow())
+    db.add(file_entry)
+    db.commit()
+    db.refresh(file_entry)
+    return file_entry.id
+
+def register_file_in_db(user_id, filename):
+    db = next(get_db())
+    file = db.query(File).filter(File.filename == filename, File.owner_id == user_id).first()
+    if not file:
+        file_id = add_file_to_db(db, user_id, filename, os.path.getsize(f"./files/{filename}"))
+    else:
+        file_id = file.id
+    
+    if not db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.file_id == file_id).first():
+        db.add(FileAccess(user_id=user_id, file_id=file_id))
         db.commit()
 
 def get_user_files(db: Session, user_id: int):
-    files_info = []
-    file_records = db.query(FileAccess).filter(FileAccess.user_id == user_id).all()
-    upload_folder = os.getenv("FILE_FOLDER", "./files")
-    
-    for file_record in file_records:
-        file_path = os.path.join(upload_folder, file_record.filename)
-        if os.path.exists(file_path):
-            file_info = {
-                "filename": file_record.filename,
-                "size": os.path.getsize(file_path),
-                "modified": os.path.getmtime(file_path)
-            }
-            files_info.append(file_info)
-    
-    return files_info
+    file_records = db.query(File).join(FileAccess, File.id == FileAccess.file_id).filter(FileAccess.user_id == user_id).all()
+    return [{
+        "filename": file.filename,
+        "size": file.size,
+        "modified": file.uploaded_at.timestamp(),
+        "is_public": file.is_public
+    } for file in file_records]
 
-def revoke_access(db: Session, user_id: int, filename: str):
-    db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.filename == filename).delete()
+def grant_access(db: Session, user_id: int, file_id: int):
+    if not db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.file_id == file_id).first():
+        db.add(FileAccess(user_id=user_id, file_id=file_id))
+        db.commit()
+
+def revoke_access(db: Session, user_id: int, file_id: int):
+    db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.file_id == file_id).delete()
     db.commit()
 
-def set_file_public(db: Session, filename: str, is_public: bool = True):
-    db.query(FileAccess).filter(FileAccess.filename == filename).update({"is_public": is_public})
+def set_file_public(db: Session, file_id: int, is_public: bool = True):
+    db.query(File).filter(File.id == file_id).update({"is_public": is_public})
     db.commit()
 
-def is_file_public(db: Session, filename: str) -> bool:
-    file = db.query(FileAccess).filter(FileAccess.filename == filename).first()
+def is_file_public(db: Session, file_id: int) -> bool:
+    file = db.query(File).filter(File.id == file_id).first()
     return file is not None and file.is_public
 
 def get_versioned_filename(upload_folder, filename):
@@ -48,7 +60,7 @@ def get_versioned_filename(upload_folder, filename):
     
     return new_filename
 
-def save_file(file):
+def save_file(file, user_id):
     upload_folder = os.getenv("FILE_FOLDER", "./files")
     if not os.path.exists(upload_folder):
         os.makedirs(upload_folder)
@@ -56,10 +68,9 @@ def save_file(file):
     versioned_filename = get_versioned_filename(upload_folder, file.filename)
     file_path = os.path.join(upload_folder, versioned_filename)
     file.save(file_path)
-    return versioned_filename
-
-def register_file_in_db(user_id, filename):
+    
     db = next(get_db())
-    if not db.query(FileAccess).filter(FileAccess.user_id == user_id, FileAccess.filename == filename).first():
-        db.add(FileAccess(user_id=user_id, filename=filename))
-        db.commit()
+    file_id = add_file_to_db(db, user_id, versioned_filename, os.path.getsize(file_path))
+    register_file_in_db(user_id, versioned_filename)
+    
+    return versioned_filename
