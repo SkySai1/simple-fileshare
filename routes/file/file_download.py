@@ -19,7 +19,7 @@ def register_file_download_routes(file_bp):
             return "Ошибка: Файл не найден", 404
         
         user_files = get_user_files(db, user["id"])
-        if user["is_admin"] or any(f["filename"] == file.filename for f in user_files) or is_file_public(db, file_id):
-            return send_from_directory("./files", file.filename, as_attachment=True)
+        if user["is_admin"] or any(f["file_id"] == file.id for f in user_files) or is_file_public(db, file_id):
+            return send_from_directory("./files", file.stored_filename, as_attachment=True, download_name=file.original_filename)
         
         return "Ошибка: У вас нет доступа к этому файлу", 403
