@@ -1,11 +1,3 @@
-function copyToClipboard(link) {
-    navigator.clipboard.writeText(link).then(() => {
-        alert('Ссылка скопирована!');
-    }).catch(err => {
-        console.error('Ошибка копирования: ', err);
-    });
-}
-
 function loadPublicLinks() {
     fetch('/file/public_links')
         .then(response => response.json())
@@ -13,14 +5,13 @@ function loadPublicLinks() {
             const list = document.getElementById('public-links-list');
             list.innerHTML = '';
             data.forEach(link => {
-                const publicUrl = `${window.location.origin}/download/public/${link.hash_key}`;
+                const publicUrl = `${window.location.origin}/file/download/public/${link.hash_key}`;
+                const createdAt = new Date(link.created_at).toLocaleString();
                 const listItem = document.createElement('li');
                 listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                 listItem.innerHTML = `
-                    <span>${link.file}</span>
-                    <button class="btn btn-outline-primary btn-sm" onclick="copyToClipboard('${publicUrl}')">
-                        📋 Скопировать ссылку
-                    </button>
+                    <span>${link.file} <small class="text-muted">(${createdAt})</small></span>
+                    <input type="text" class="form-control" value="${publicUrl}" readonly onclick="this.select()">
                 `;
                 list.appendChild(listItem);
             });
