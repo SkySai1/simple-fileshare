@@ -12,10 +12,14 @@
                     <br>
                     <small>Изменен: {{ file.modified }}</small>
                 </div>
-                <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">
-                    Скачать
-                </a>
+                <div>
+                    <button class="btn btn-outline-secondary btn-sm toggle-public" data-file-id="{{ file.file_id }}">
+                        <i class="bi {% if file.is_public %}bi-unlock{% else %}bi-lock{% endif %}"></i>
+                    </button>
+                    <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">Скачать</a>
+                </div>
             </li>
         {% endfor %}
     </ul>
 </div>
+<script src="{{ url_for('static', filename='js/file_access.js') }}"></script>
