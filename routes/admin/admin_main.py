@@ -14,5 +14,4 @@ def register_admin_routes(admin_bp):
         users = get_users(db)
         all_files = get_all_files(db)  # Загружаем файлы из БД
         
-        print(all_files)
         return render_template('admin.html', users=users, files=all_files)
