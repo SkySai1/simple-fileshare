@@ -1,9 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     function updatePublicStatus(fileId, isPublic) {
-        const toggleSwitch = document.querySelector(`.toggle-public[data-file-id='${fileId}']`);
-        if (toggleSwitch) {
-            toggleSwitch.checked = isPublic;
-        }
+        document.querySelectorAll(`.toggle-public[data-file-id='${fileId}']`).forEach(toggle => {
+            toggle.checked = isPublic;
+        });
     }
 
     document.querySelectorAll(".toggle-public").forEach(toggle => {
