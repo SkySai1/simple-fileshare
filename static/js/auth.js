@@ -20,7 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
             
             if (data.success) {
-                window.location.href = data.redirect_url;
+                //window.location.href = data.redirect_url;
+                window.location.href = "/";
             } else {
                 errorAlert.textContent = data.error;
                 errorAlert.style.display = "block";
