@@ -31,3 +31,16 @@ def delete_public_link(hash_key):
     Удаляет публичную ссылку из Redis.
     """
     redis_client.delete(hash_key)
+
+def get_all_public_links(username=None, is_admin=False):
+    """
+    Возвращает все публичные ссылки. Если указан username, фильтрует по пользователю.
+    """
+    all_links = []
+    for key in redis_client.scan_iter():
+        data = redis_client.get(key)
+        if data:
+            link_info = json.loads(data)
+            if is_admin or (username and link_info["user"] == username):
+                all_links.append({"hash_key": key, "file": link_info["file"], "user": link_info["user"]})
+    return all_links

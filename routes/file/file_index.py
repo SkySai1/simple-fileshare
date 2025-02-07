@@ -2,6 +2,7 @@ from flask import render_template, redirect, url_for, session, jsonify, request
 from sqlalchemy.orm import Session
 from utils.database import get_db
 from utils.file_service import get_user_files, get_all_files, get_public_files, delete_file
+from utils.public_links import get_all_public_links
 
 def register_file_index_routes(file_bp):
     @file_bp.route('/')
@@ -36,3 +37,12 @@ def register_file_index_routes(file_bp):
             return jsonify(get_all_files(db))
         
         return jsonify(get_user_files(db, user["id"]))
+
+    @file_bp.route('/public_links')
+    def get_public_links():
+        if "user" not in session:
+            return jsonify({"error": "Требуется авторизация"}), 403
+        
+        user = session["user"]
+        links = get_all_public_links(username=user["username"], is_admin=user["is_admin"])
+        return jsonify(links)
