@@ -133,7 +133,7 @@ def delete_file(db: Session, user_id: int, file_id: int):
         raise PermissionError("У вас нет прав для удаления этого файла")
 
     # Удаляем физический файл
-    file_path = os.path.join("uploads", file.stored_filename)
+    file_path = os.path.join(os.getenv("FILE_FOLDER", "./files"), file.stored_filename)
     if os.path.exists(file_path):
         os.remove(file_path)
 
