@@ -120,3 +120,23 @@ def toggle_file_public(db: Session, user_id: int, file_id: int):
     file.is_public = not file.is_public
     db.commit()
     return file.is_public
+
+def delete_file(db: Session, user_id: int, file_id: int):
+    """Удаляет файл, если пользователь — владелец или администратор."""
+    file = db.query(File).filter(File.id == file_id).first()
+
+    if not file:
+        raise ValueError("Файл не найден")
+
+    # Проверяем права: только владелец или администратор могут удалять
+    if file.owner_id != user_id and not db.query(User).filter(User.id == user_id, User.is_admin == True).first():
+        raise PermissionError("У вас нет прав для удаления этого файла")
+
+    # Удаляем физический файл
+    file_path = os.path.join("uploads", file.stored_filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+
+    # Удаляем запись из БД
+    db.delete(file)
+    db.commit()

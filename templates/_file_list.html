@@ -4,7 +4,7 @@
 <div class="collapse show" id="userFiles">
     <ul class="list-group">
         {% for file in files %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="list-group-item d-flex justify-content-between align-items-center" id="file-{{ file.file_id }}">
                 <div>
                     <strong>{{ file.filename }}</strong>
                     <br>
@@ -12,13 +12,17 @@
                     <br>
                     <small>Изменен: {{ file.modified }}</small>
                 </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input toggle-public" type="checkbox" role="switch" data-file-id="{{ file.file_id }}" {% if file.is_public %}checked{% endif %}>
-                    <label class="form-check-label">Публичный</label>
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch me-3">
+                        <input class="form-check-input toggle-public" type="checkbox" role="switch" data-file-id="{{ file.file_id }}" {% if file.is_public %}checked{% endif %}>
+                        <label class="form-check-label">Публичный</label>
+                    </div>
+                    <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">Скачать</a>
+                    <button class="btn btn-danger btn-sm ms-2 delete-file" data-file-id="{{ file.file_id }}">🗑</button>
                 </div>
-                <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">Скачать</a>
             </li>
         {% endfor %}
     </ul>
 </div>
 <script src="{{ url_for('static', filename='js/file_access.js') }}"></script>
+<script src="{{ url_for('static', filename='js/file_delete.js') }}"></script>
