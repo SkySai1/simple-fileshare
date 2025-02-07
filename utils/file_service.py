@@ -94,3 +94,29 @@ def save_file(file, user_id):
     register_file_in_db(user_id, file.filename, stored_filename)
     
     return stored_filename
+
+def get_public_files(db: Session):
+    """Возвращает список публичных файлов"""
+    file_records = db.query(File).filter(File.is_public == True).all()
+    return [{
+        "file_id": file.id,
+        "filename": file.original_filename,
+        "size": file.size,
+        "modified": file.uploaded_at.strftime("%Y-%m-%d %H:%M"),
+        "owner_username": file.owner.username
+    } for file in file_records]
+
+def toggle_file_public(db: Session, user_id: int, file_id: int):
+    """Открывает или закрывает доступ к файлу, проверяя права"""
+    file = db.query(File).filter(File.id == file_id).first()
+
+    if not file:
+        raise ValueError("Файл не найден")
+
+    # Только владелец или администратор могут изменять доступ
+    if file.owner_id != user_id and not db.query(User).filter(User.id == user_id, User.is_admin == True).first():
+        raise PermissionError("У вас нет прав для изменения доступа к файлу")
+
+    file.is_public = not file.is_public
+    db.commit()
+    return file.is_public

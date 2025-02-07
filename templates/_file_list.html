@@ -1,20 +1,24 @@
-{% if files %}
-<ul class="list-group">
-    {% for file in files %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-                <strong>{{ file.filename }}</strong>
-                <br>
-                <small>Размер: {{ (file.size / 1024)|round(2) }} KB</small>
-                <br>
-                <small>Изменен: {{ file.modified }}</small>
-            </div>
-            <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">
-                Скачать
-            </a>
-        </li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>Файлы отсутствуют.</p>
-{% endif %}
+<button class="btn btn-secondary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#userFiles" aria-expanded="true" aria-controls="userFiles">
+    Мои файлы
+</button>
+<div class="collapse show" id="userFiles">
+    <ul class="list-group">
+        {% for file in files %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>{{ file.filename }}</strong>
+                    <br>
+                    <small>Размер: {{ (file.size / 1024)|round(2) }} KB</small>
+                    <br>
+                    <small>Изменен: {{ file.modified }}</small>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input toggle-public" type="checkbox" role="switch" data-file-id="{{ file.file_id }}" {% if file.is_public %}checked{% endif %}>
+                    <label class="form-check-label">Публичный</label>
+                </div>
+                <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">Скачать</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<script src="{{ url_for('static', filename='js/file_access.js') }}"></script>
