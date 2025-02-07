@@ -13,6 +13,9 @@
                     <small>Изменен: {{ file.modified }}</small>
                 </div>
                 <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-success btn-sm me-2 generate-public-link" data-file-id="{{ file.file_id }}">
+                        🔗 Опубликовать
+                    </button>
                     <div class="form-check form-switch me-3">
                         <input class="form-check-input toggle-public" type="checkbox" role="switch" data-file-id="{{ file.file_id }}" {% if file.is_public %}checked{% endif %}>
                         <label class="form-check-label">Публичный</label>

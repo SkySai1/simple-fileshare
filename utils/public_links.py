@@ -3,16 +3,18 @@ import json
 import hashlib
 from flask import current_app
 from datetime import timedelta
+from utils.database import get_db
+from utils.models import File
 
 # Инициализация Redis
 redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
 
-def generate_public_link(stored_filename, username):
+def generate_public_link(stored_filename, original_filename, username):
     """
     Генерирует хэш-ссылку на файл и сохраняет её в Redis.
     """
     secret_key = current_app.config['SECRET_KEY']
-    data = json.dumps({'file': stored_filename, 'user': username})
+    data = json.dumps({'file': stored_filename, 'original_filename': original_filename, 'user': username})
     hash_key = hashlib.sha256((data + secret_key).encode()).hexdigest()
     redis_client.setex(hash_key, timedelta(hours=24), data)
     return hash_key
@@ -42,5 +44,5 @@ def get_all_public_links(username=None, is_admin=False):
         if data:
             link_info = json.loads(data)
             if is_admin or (username and link_info["user"] == username):
-                all_links.append({"hash_key": key, "file": link_info["file"], "user": link_info["user"]})
+                all_links.append({"hash_key": key, "file": link_info["original_filename"], "user": link_info["user"]})
     return all_links
