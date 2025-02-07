@@ -12,7 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                document.getElementById(`file-${fileId}`).remove();
+                // Удаляем файл из всех блоков, где он присутствует
+                document.querySelectorAll(`[id='file-${fileId}']`).forEach(fileElement => fileElement.remove());
             } else {
                 alert(data.error || "Ошибка при удалении файла");
             }
