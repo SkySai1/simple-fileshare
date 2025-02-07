@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(data => {
                 if (data.success) {
                     updatePublicStatus(fileId, data.is_public);
+                    document.dispatchEvent(new Event("publicFilesUpdated")); // Сообщаем другим скриптам
                 } else {
                     alert(data.error || "Ошибка при обновлении доступа");
                 }

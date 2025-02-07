@@ -14,10 +14,15 @@
                     <br>
                     <small>Владелец: {{ file.owner_username }}</small>
                 </div>
-                <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">
-                    Скачать
-                </a>
+                <div class="d-flex align-items-center">
+                    <div class="form-check form-switch me-3">
+                        <input class="form-check-input toggle-public" type="checkbox" role="switch" data-file-id="{{ file.file_id }}" {% if file.is_public %}checked{% endif %}>
+                        <label class="form-check-label">Публичный</label>
+                    </div>
+                    <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">Скачать</a>
+                </div>
             </li>
         {% endfor %}
     </ul>
 </div>
+<script src="{{ url_for('static', filename='js/file_access.js') }}"></script>
