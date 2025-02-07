@@ -2,7 +2,7 @@ from flask import redirect, url_for, session, request, jsonify
 from sqlalchemy.orm import Session
 from utils.database import get_db
 from utils.file_service import toggle_file_public, get_public_files
-from utils.public_links import generate_public_link
+from utils.public_links import generate_public_link, delete_public_link
 
 def register_file_access_routes(file_bp):
     @file_bp.route('/toggle_public/<int:file_id>', methods=['POST'])
@@ -35,3 +35,11 @@ def register_file_access_routes(file_bp):
         username = session["user"]["username"]
         hash_key = generate_public_link(file_id, username)
         return jsonify({"public_link": url_for('file.download_public_file', hash_key=hash_key, _external=True)})
+
+    @file_bp.route('/delete_public_link/<hash_key>', methods=['DELETE'])
+    def delete_public_link_route(hash_key):
+        if "user" not in session:
+            return jsonify({"error": "Требуется авторизация"}), 403
+        
+        delete_public_link(hash_key)
+        return jsonify({"success": True, "message": "Ссылка удалена"})
