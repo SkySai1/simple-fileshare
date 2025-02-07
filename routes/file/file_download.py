@@ -1,8 +1,9 @@
-from flask import send_from_directory, redirect, url_for, session
+from flask import send_from_directory, redirect, url_for, session, request
 from sqlalchemy.orm import Session
 from utils.database import get_db
 from utils.file_service import get_user_files, is_file_public
 from utils.models import File
+from utils.public_links import get_public_file
 import os
 
 def register_file_download_routes(file_bp):
@@ -23,3 +24,11 @@ def register_file_download_routes(file_bp):
             return send_from_directory("./files", file.stored_filename, as_attachment=True, download_name=file.original_filename)
         
         return "Ошибка: У вас нет доступа к этому файлу", 403
+
+    @file_bp.route('/download/public/<hash_key>')
+    def download_public_file(hash_key):
+        file_data = get_public_file(hash_key)
+        if not file_data:
+            return "Ошибка: Ссылка недействительна или срок действия истек", 404
+        
+        return send_from_directory("./files", file_data["file"], as_attachment=True)
