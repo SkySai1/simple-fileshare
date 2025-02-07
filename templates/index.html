@@ -2,6 +2,12 @@
 
 {% block title %}Доступные файлы{% endblock %}
 
+{% block head %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+<script src="{{ url_for('static', filename='js/file_access.js') }}"></script>
+<script src="{{ url_for('static', filename='js/file_delete.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 <h2 class="mb-4">Доступные файлы</h2>
 
@@ -28,5 +34,4 @@
     </div>
 {% endif %}
 
-<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 {% endblock %}
