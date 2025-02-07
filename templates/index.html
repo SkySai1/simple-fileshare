@@ -14,10 +14,14 @@
     <div id="upload-message" class="mt-2"></div>
 </form>
 
-{% include "_file_list.html" %}
+<div class="mb-4">
+    {% include "_file_list.html" %}
+</div>
 
 {% if user.is_admin %}
-    {% include "_file_list_all.html" %}
+    <div class="mb-4">
+        {% include "_file_list_all.html" %}
+    </div>
 {% endif %}
 
 <script src="{{ url_for('static', filename='js/upload.js') }}"></script>
