@@ -1,9 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll(".toggle-public").forEach(button => {
-        button.addEventListener("click", function () {
+    function updatePublicStatus(fileId, isPublic) {
+        const toggleSwitch = document.querySelector(`.toggle-public[data-file-id='${fileId}']`);
+        if (toggleSwitch) {
+            toggleSwitch.checked = isPublic;
+        }
+    }
+
+    document.querySelectorAll(".toggle-public").forEach(toggle => {
+        toggle.addEventListener("change", function () {
             const fileId = this.dataset.fileId;
-            const icon = this.querySelector("i");
-            
             fetch(`/file/toggle_public/${fileId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
@@ -11,8 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    icon.classList.toggle("bi-unlock", data.is_public);
-                    icon.classList.toggle("bi-lock", !data.is_public);
+                    updatePublicStatus(fileId, data.is_public);
                 } else {
                     alert(data.error || "Ошибка при обновлении доступа");
                 }
@@ -20,4 +24,11 @@ document.addEventListener("DOMContentLoaded", function () {
             .catch(error => console.error("Ошибка запроса:", error));
         });
     });
+
+    fetch("/file/public_files")
+        .then(response => response.json())
+        .then(files => {
+            files.forEach(file => updatePublicStatus(file.file_id, true));
+        })
+        .catch(error => console.error("Ошибка загрузки публичных файлов:", error));
 });

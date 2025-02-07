@@ -12,12 +12,11 @@
                     <br>
                     <small>Изменен: {{ file.modified }}</small>
                 </div>
-                <div>
-                    <button class="btn btn-outline-secondary btn-sm toggle-public" data-file-id="{{ file.file_id }}">
-                        <i class="bi {% if file.is_public %}bi-unlock{% else %}bi-lock{% endif %}"></i>
-                    </button>
-                    <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">Скачать</a>
+                <div class="form-check form-switch">
+                    <input class="form-check-input toggle-public" type="checkbox" role="switch" data-file-id="{{ file.file_id }}" {% if file.is_public %}checked{% endif %}>
+                    <label class="form-check-label">Публичный</label>
                 </div>
+                <a href="{{ url_for('file.download_file', file_id=file.file_id) }}" class="btn btn-primary btn-sm">Скачать</a>
             </li>
         {% endfor %}
     </ul>
