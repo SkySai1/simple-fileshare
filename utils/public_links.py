@@ -19,7 +19,7 @@ def generate_public_link(file_id, username):
         raise ValueError("Файл не найден")
     
     secret_key = current_app.config['SECRET_KEY']
-    timestamp = datetime.now()
+    timestamp = datetime.now().isoformat(timespec="minutes")
     data = json.dumps({'file': file.stored_filename, 'original_filename': file.original_filename, 'user': username, 'created_at': timestamp})
     hash_key = hashlib.sha256((data + secret_key).encode()).hexdigest()
     redis_client.setex(hash_key, timedelta(hours=24), data)
